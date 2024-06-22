@@ -36,12 +36,6 @@ build:
 	CGO_ENABLED=0 \
 	go build -o dblab .
 
-.PHONY: build-sqlite3
-## build-sqlite3: Builds the Go program with CGO_ENABLED enabled.
-build-sqlite3:
-	CGO_ENABLED=0 \
-	go build -o dblab .
-
 .PHONY: run
 ## run: Runs the application
 run: build
@@ -51,6 +45,11 @@ run: build
 ## run-mysql: Runs the application with a connection to mysql
 run-mysql: build
 	./dblab --host localhost --user myuser --db mydb --pass 5@klkbN#ABC --ssl enable --port 3306 --driver mysql
+
+.PHONY: run-oracle
+## run-oracle: Runs the application making a connection to the Oreacle database
+run-oracle: build
+	./dblab --host localhost --user system --db FREEPDB1 --pass password --port 1521 --driver oracle --limit 50
 
 .PHONY: run-mysql-socket
 ## run-mysql-socket: Runs the application with a connection to mysql through a socket file. In this example the socke file is located in /var/lib/mysql/mysql.sock.
@@ -69,9 +68,13 @@ run-mysql-socket-url: build
 
 .PHONY: run-sqlite3
 ## run-sqlite3: Runs the application with a connection to sqlite3
-run-sqlite3: build-sqlite3
-	docker compose run --rm dblab-sqlite3
+run-sqlite3: build
 	./dblab --db db/dblab.db --driver sqlite
+
+.PHONY: run-sqlite3-url
+## run-sqlite3-url: Runs the application with a connection string to sqlite3
+run-sqlite3-url: build
+	./dblab --url 'file:db/dblab.db?_pragma=foreign_keys(1)&_time_format=sqlite'
 
 .PHONY: run-url
 ## run-url: Runs the app passing the url as parameter
